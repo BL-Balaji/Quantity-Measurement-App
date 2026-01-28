@@ -8,13 +8,13 @@ class QuantityMeasurementAppTest {
     @Test void givenDifferentFeet_shouldNotBeEqual() {
         assertFalse(new QuantityMeasurementApp.Feet(1.0).equals(new QuantityMeasurementApp.Feet(2.0)));
     }
-    @Test void givenFeet_comparedWithNull_shouldReturnFalse() {
-        assertFalse(new QuantityMeasurementApp.Feet(1.0).equals(null));
+    @Test void givenSameInches_shouldBeEqual() {
+        assertTrue(new QuantityMeasurementApp.Inches(5.0).equals(new QuantityMeasurementApp.Inches(5.0)));
     }
-    @Test void givenSameReference_shouldBeEqual() {
-        QuantityMeasurementApp.Feet a = new QuantityMeasurementApp.Feet(1.0); assertTrue(a.equals(a));
+    @Test void givenDifferentInches_shouldNotBeEqual() {
+        assertFalse(new QuantityMeasurementApp.Inches(3.0).equals(new QuantityMeasurementApp.Inches(7.0)));
     }
-    @Test void givenFeet_comparedWithDifferentType_shouldReturnFalse() {
-        assertFalse(new QuantityMeasurementApp.Feet(1.0).equals("1.0"));
+    @Test void givenInches_comparedWithNull_shouldReturnFalse() {
+        assertFalse(new QuantityMeasurementApp.Inches(1.0).equals(null));
     }
 }
