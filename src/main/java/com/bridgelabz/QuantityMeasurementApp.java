@@ -6,6 +6,7 @@ public class QuantityMeasurementApp {
         private final double toFeetFactor;
         LengthUnit(double f) { this.toFeetFactor = f; }
         public double toFeet(double v) { return v * toFeetFactor; }
+        public double fromFeet(double v) { return v / toFeetFactor; }
     }
     public static final class QuantityLength {
         private final double value;
@@ -17,6 +18,12 @@ public class QuantityMeasurementApp {
         public double getValue() { return value; }
         public LengthUnit getUnit() { return unit; }
         private double valueInFeet() { return unit.toFeet(value); }
+        public QuantityLength convertTo(LengthUnit target) {
+            Objects.requireNonNull(target, "Target unit must not be null");
+            double feet = unit.toFeet(value);
+            double converted = target.fromFeet(feet);
+            return new QuantityLength(Math.round(converted * 100.0) / 100.0, target);
+        }
         @Override public boolean equals(Object obj) {
             if (this == obj) return true;
             if (obj == null || getClass() != obj.getClass()) return false;
@@ -27,8 +34,7 @@ public class QuantityMeasurementApp {
         @Override public String toString() { return "Quantity(" + value + ", " + unit + ")"; }
     }
     public static void main(String[] args) {
-        System.out.println("1 yard == 3 feet: " +
-            new QuantityMeasurementApp.QuantityLength(1.0, LengthUnit.YARDS).equals(
-            new QuantityMeasurementApp.QuantityLength(3.0, LengthUnit.FEET)));
+        QuantityLength q = new QuantityLength(1.0, LengthUnit.FEET);
+        System.out.println("1 ft in inches: " + q.convertTo(LengthUnit.INCH));
     }
 }
