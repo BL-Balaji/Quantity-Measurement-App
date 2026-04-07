@@ -13,28 +13,32 @@ public class QuantityMeasurementApp {
         private final LengthUnit unit;
         public QuantityLength(double value, LengthUnit unit) {
             this.value = value;
-            this.unit = Objects.requireNonNull(unit, "Unit must not be null");
+            this.unit = Objects.requireNonNull(unit);
         }
         public double getValue() { return value; }
         public LengthUnit getUnit() { return unit; }
         private double valueInFeet() { return unit.toFeet(value); }
         public QuantityLength convertTo(LengthUnit target) {
-            Objects.requireNonNull(target, "Target unit must not be null");
-            double feet = unit.toFeet(value);
-            double converted = target.fromFeet(feet);
-            return new QuantityLength(Math.round(converted * 100.0) / 100.0, target);
+            double converted = target.fromFeet(unit.toFeet(value));
+            return new QuantityLength(Math.round(converted*100.0)/100.0, target);
+        }
+        public QuantityLength add(QuantityLength other) {
+            Objects.requireNonNull(other, "Other quantity must not be null");
+            double sumFeet = this.valueInFeet() + other.valueInFeet();
+            double inThisUnit = this.unit.fromFeet(sumFeet);
+            return new QuantityLength(Math.round(inThisUnit*100.0)/100.0, this.unit);
         }
         @Override public boolean equals(Object obj) {
             if (this == obj) return true;
             if (obj == null || getClass() != obj.getClass()) return false;
-            QuantityLength other = (QuantityLength) obj;
-            return Math.abs(this.valueInFeet() - other.valueInFeet()) < 1e-6;
+            return Math.abs(this.valueInFeet() - ((QuantityLength)obj).valueInFeet()) < 1e-6;
         }
-        @Override public int hashCode() { return Objects.hash(Math.round(valueInFeet() * 1e6)); }
+        @Override public int hashCode() { return Objects.hash(Math.round(valueInFeet()*1e6)); }
         @Override public String toString() { return "Quantity(" + value + ", " + unit + ")"; }
     }
     public static void main(String[] args) {
-        QuantityLength q = new QuantityLength(1.0, LengthUnit.FEET);
-        System.out.println("1 ft in inches: " + q.convertTo(LengthUnit.INCH));
+        QuantityLength a = new QuantityLength(1.0, LengthUnit.FEET);
+        QuantityLength b = new QuantityLength(12.0, LengthUnit.INCH);
+        System.out.println("1 ft + 12 in = " + a.add(b));
     }
 }
