@@ -19,14 +19,14 @@ public class QuantityMeasurementApp {
         public LengthUnit getUnit() { return unit; }
         private double valueInFeet() { return unit.toFeet(value); }
         public QuantityLength convertTo(LengthUnit target) {
-            double converted = target.fromFeet(unit.toFeet(value));
-            return new QuantityLength(Math.round(converted*100.0)/100.0, target);
+            return new QuantityLength(Math.round(target.fromFeet(unit.toFeet(value))*100.0)/100.0, target);
         }
-        public QuantityLength add(QuantityLength other) {
-            Objects.requireNonNull(other, "Other quantity must not be null");
+        public QuantityLength add(QuantityLength other) { return add(other, this.unit); }
+        public QuantityLength add(QuantityLength other, LengthUnit targetUnit) {
+            Objects.requireNonNull(other, "Other must not be null");
+            Objects.requireNonNull(targetUnit, "Target unit must not be null");
             double sumFeet = this.valueInFeet() + other.valueInFeet();
-            double inThisUnit = this.unit.fromFeet(sumFeet);
-            return new QuantityLength(Math.round(inThisUnit*100.0)/100.0, this.unit);
+            return new QuantityLength(Math.round(targetUnit.fromFeet(sumFeet)*100.0)/100.0, targetUnit);
         }
         @Override public boolean equals(Object obj) {
             if (this == obj) return true;
@@ -39,6 +39,6 @@ public class QuantityMeasurementApp {
     public static void main(String[] args) {
         QuantityLength a = new QuantityLength(1.0, LengthUnit.FEET);
         QuantityLength b = new QuantityLength(12.0, LengthUnit.INCH);
-        System.out.println("1 ft + 12 in = " + a.add(b));
+        System.out.println("1ft+12in in YARDS: " + a.add(b, LengthUnit.YARDS));
     }
 }
