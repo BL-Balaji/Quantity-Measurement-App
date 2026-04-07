@@ -1,44 +1,41 @@
 ﻿package com.bridgelabz;
 import java.util.Objects;
 public class QuantityMeasurementApp {
-    public enum LengthUnit {
-        FEET(1.0), INCH(1.0 / 12.0), YARDS(3.0), CENTIMETERS(1.0 / 30.48);
-        private final double toFeetFactor;
-        LengthUnit(double f) { this.toFeetFactor = f; }
-        public double toFeet(double v) { return v * toFeetFactor; }
-        public double fromFeet(double v) { return v / toFeetFactor; }
-    }
     public static final class QuantityLength {
+        private static final double EPS = 1e-6;
         private final double value;
         private final LengthUnit unit;
         public QuantityLength(double value, LengthUnit unit) {
             this.value = value;
-            this.unit = Objects.requireNonNull(unit);
+            this.unit = Objects.requireNonNull(unit, "Unit must not be null");
         }
         public double getValue() { return value; }
         public LengthUnit getUnit() { return unit; }
-        private double valueInFeet() { return unit.toFeet(value); }
         public QuantityLength convertTo(LengthUnit target) {
-            return new QuantityLength(Math.round(target.fromFeet(unit.toFeet(value))*100.0)/100.0, target);
+            Objects.requireNonNull(target, "Target unit must not be null");
+            double base = unit.convertToBaseUnit(value);
+            double converted = target.convertFromBaseUnit(base);
+            return new QuantityLength(Math.round(converted*100.0)/100.0, target);
         }
         public QuantityLength add(QuantityLength other) { return add(other, this.unit); }
         public QuantityLength add(QuantityLength other, LengthUnit targetUnit) {
-            Objects.requireNonNull(other, "Other must not be null");
-            Objects.requireNonNull(targetUnit, "Target unit must not be null");
-            double sumFeet = this.valueInFeet() + other.valueInFeet();
-            return new QuantityLength(Math.round(targetUnit.fromFeet(sumFeet)*100.0)/100.0, targetUnit);
+            Objects.requireNonNull(other); Objects.requireNonNull(targetUnit);
+            double sum = this.unit.convertToBaseUnit(this.value) + other.unit.convertToBaseUnit(other.value);
+            return new QuantityLength(Math.round(targetUnit.convertFromBaseUnit(sum)*100.0)/100.0, targetUnit);
         }
         @Override public boolean equals(Object obj) {
             if (this == obj) return true;
-            if (obj == null || getClass() != obj.getClass()) return false;
-            return Math.abs(this.valueInFeet() - ((QuantityLength)obj).valueInFeet()) < 1e-6;
+            if (!(obj instanceof QuantityLength other)) return false;
+            return Math.abs(unit.convertToBaseUnit(value) - other.unit.convertToBaseUnit(other.value)) < EPS;
         }
-        @Override public int hashCode() { return Objects.hash(Math.round(valueInFeet()*1e6)); }
+        @Override public int hashCode() { return Objects.hash(Math.round(unit.convertToBaseUnit(value)/EPS)); }
         @Override public String toString() { return "Quantity(" + value + ", " + unit + ")"; }
     }
     public static void main(String[] args) {
-        QuantityLength a = new QuantityLength(1.0, LengthUnit.FEET);
-        QuantityLength b = new QuantityLength(12.0, LengthUnit.INCH);
-        System.out.println("1ft+12in in YARDS: " + a.add(b, LengthUnit.YARDS));
+        QuantityLength q1 = new QuantityLength(1.0, LengthUnit.FEET);
+        QuantityLength q2 = new QuantityLength(12.0, LengthUnit.INCH);
+        System.out.println("Equals: " + q1.equals(q2));
+        System.out.println("Add: " + q1.add(q2));
+        System.out.println("Convert: " + q1.convertTo(LengthUnit.INCH));
     }
 }

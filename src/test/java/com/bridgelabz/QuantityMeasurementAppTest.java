@@ -2,21 +2,25 @@
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 class QuantityMeasurementAppTest {
-    @Test void given1FeetAnd12Inches_addInYards_shouldGiveCorrect() {
-        QuantityMeasurementApp.QuantityLength a = new QuantityMeasurementApp.QuantityLength(1.0, QuantityMeasurementApp.LengthUnit.FEET);
-        QuantityMeasurementApp.QuantityLength b = new QuantityMeasurementApp.QuantityLength(12.0, QuantityMeasurementApp.LengthUnit.INCH);
-        QuantityMeasurementApp.QuantityLength result = a.add(b, QuantityMeasurementApp.LengthUnit.YARDS);
-        assertEquals(QuantityMeasurementApp.LengthUnit.YARDS, result.getUnit());
-        assertEquals(0.67, result.getValue(), 1e-2);
+    @Test void given1FeetAnd12Inches_shouldBeEqual() {
+        assertEquals(new QuantityMeasurementApp.QuantityLength(1.0, LengthUnit.FEET),
+                     new QuantityMeasurementApp.QuantityLength(12.0, LengthUnit.INCH));
     }
-    @Test void given1FeetAnd12Inches_addInInches_shouldGive24() {
-        QuantityMeasurementApp.QuantityLength a = new QuantityMeasurementApp.QuantityLength(1.0, QuantityMeasurementApp.LengthUnit.FEET);
-        QuantityMeasurementApp.QuantityLength b = new QuantityMeasurementApp.QuantityLength(12.0, QuantityMeasurementApp.LengthUnit.INCH);
-        assertEquals(24.0, a.add(b, QuantityMeasurementApp.LengthUnit.INCH).getValue(), 1e-2);
+    @Test void given1Yard3Feet_shouldBeEqual() {
+        assertEquals(new QuantityMeasurementApp.QuantityLength(1.0, LengthUnit.YARDS),
+                     new QuantityMeasurementApp.QuantityLength(3.0, LengthUnit.FEET));
     }
-    @Test void given1FeetAnd12Inches_addDefaultUnit_shouldGive2Feet() {
-        QuantityMeasurementApp.QuantityLength a = new QuantityMeasurementApp.QuantityLength(1.0, QuantityMeasurementApp.LengthUnit.FEET);
-        QuantityMeasurementApp.QuantityLength b = new QuantityMeasurementApp.QuantityLength(12.0, QuantityMeasurementApp.LengthUnit.INCH);
-        assertEquals(2.0, a.add(b).getValue(), 1e-2);
+    @Test void given1Feet_convertToInches_shouldBe12() {
+        assertEquals(12.0, new QuantityMeasurementApp.QuantityLength(1.0, LengthUnit.FEET)
+            .convertTo(LengthUnit.INCH).getValue(), 1e-2);
+    }
+    @Test void given1FeetAnd12In_add_shouldBe2Feet() {
+        assertEquals(2.0, new QuantityMeasurementApp.QuantityLength(1.0, LengthUnit.FEET)
+            .add(new QuantityMeasurementApp.QuantityLength(12.0, LengthUnit.INCH)).getValue(), 1e-2);
+    }
+    @Test void givenLengthUnit_convertToBase_isCorrect() {
+        assertEquals(1.0, LengthUnit.FEET.convertToBaseUnit(1.0), 1e-6);
+        assertEquals(1.0/12.0, LengthUnit.INCH.convertToBaseUnit(1.0), 1e-6);
+        assertEquals(3.0, LengthUnit.YARDS.convertToBaseUnit(1.0), 1e-6);
     }
 }
