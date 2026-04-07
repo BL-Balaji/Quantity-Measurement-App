@@ -7,8 +7,7 @@ public class Quantity<U extends IMeasurable> {
     public Quantity(double value, U unit) {
         if (unit == null) throw new IllegalArgumentException("Unit cannot be null");
         if (!Double.isFinite(value)) throw new IllegalArgumentException("Value must be finite");
-        this.value = value;
-        this.unit = unit;
+        this.value = value; this.unit = unit;
     }
     public double getValue() { return value; }
     public U getUnit() { return unit; }
@@ -16,17 +15,26 @@ public class Quantity<U extends IMeasurable> {
         if (targetUnit == null) throw new IllegalArgumentException("Target unit cannot be null");
         if (this.unit.getClass() != targetUnit.getClass()) throw new IllegalArgumentException("Target unit must belong to same category");
         double base = unit.convertToBaseUnit(value);
-        double converted = targetUnit.convertFromBaseUnit(base);
-        return new Quantity<>(Math.round(converted*100.0)/100.0, targetUnit);
+        return new Quantity<>(Math.round(targetUnit.convertFromBaseUnit(base)*100.0)/100.0, targetUnit);
     }
     public Quantity<U> add(Quantity<U> other) { return add(other, this.unit); }
     public Quantity<U> add(Quantity<U> other, U targetUnit) {
+        validateOperands(other, targetUnit, "addition");
+        double sum = unit.convertToBaseUnit(value) + other.unit.convertToBaseUnit(other.value);
+        return new Quantity<>(Math.round(targetUnit.convertFromBaseUnit(sum)*100.0)/100.0, targetUnit);
+    }
+    public Quantity<U> subtract(Quantity<U> other) { return subtract(other, this.unit); }
+    public Quantity<U> subtract(Quantity<U> other, U targetUnit) {
+        validateOperands(other, targetUnit, "subtraction");
+        double diff = unit.convertToBaseUnit(value) - other.unit.convertToBaseUnit(other.value);
+        return new Quantity<>(Math.round(targetUnit.convertFromBaseUnit(diff)*100.0)/100.0, targetUnit);
+    }
+    private void validateOperands(Quantity<U> other, U targetUnit, String op) {
         if (other == null) throw new IllegalArgumentException("Other cannot be null");
         if (this.unit.getClass() != other.unit.getClass()) throw new IllegalArgumentException("Cross-category not allowed");
         if (targetUnit == null) throw new IllegalArgumentException("Target unit cannot be null");
-        this.unit.validateOperationSupport("addition");
-        double sum = this.unit.convertToBaseUnit(this.value) + other.unit.convertToBaseUnit(other.value);
-        return new Quantity<>(Math.round(targetUnit.convertFromBaseUnit(sum)*100.0)/100.0, targetUnit);
+        this.unit.validateOperationSupport(op);
+        other.unit.validateOperationSupport(op);
     }
     @Override public boolean equals(Object obj) {
         if (this == obj) return true;
