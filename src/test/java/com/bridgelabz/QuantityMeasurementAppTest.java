@@ -3,21 +3,23 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 class QuantityMeasurementAppTest {
     @Test void givenSameFeet_shouldBeEqual() {
-        assertTrue(new QuantityMeasurementApp.Feet(1.0).equals(new QuantityMeasurementApp.Feet(1.0)));
+        assertEquals(new QuantityMeasurementApp.QuantityLength(1.0, QuantityMeasurementApp.LengthUnit.FEET),
+                     new QuantityMeasurementApp.QuantityLength(1.0, QuantityMeasurementApp.LengthUnit.FEET));
     }
-    @Test void givenDifferentFeet_shouldNotBeEqual() {
-        assertFalse(new QuantityMeasurementApp.Feet(1.0).equals(new QuantityMeasurementApp.Feet(2.0)));
+    @Test void given1FeetAnd12Inches_shouldBeEqual() {
+        assertEquals(new QuantityMeasurementApp.QuantityLength(1.0, QuantityMeasurementApp.LengthUnit.FEET),
+                     new QuantityMeasurementApp.QuantityLength(12.0, QuantityMeasurementApp.LengthUnit.INCH));
+    }
+    @Test void given1FeetAnd1Inch_shouldNotBeEqual() {
+        assertNotEquals(new QuantityMeasurementApp.QuantityLength(1.0, QuantityMeasurementApp.LengthUnit.FEET),
+                        new QuantityMeasurementApp.QuantityLength(1.0, QuantityMeasurementApp.LengthUnit.INCH));
     }
     @Test void givenSameInches_shouldBeEqual() {
-        assertTrue(new QuantityMeasurementApp.Inches(5.0).equals(new QuantityMeasurementApp.Inches(5.0)));
+        assertEquals(new QuantityMeasurementApp.QuantityLength(5.0, QuantityMeasurementApp.LengthUnit.INCH),
+                     new QuantityMeasurementApp.QuantityLength(5.0, QuantityMeasurementApp.LengthUnit.INCH));
     }
-    @Test void givenDifferentInches_shouldNotBeEqual() {
-        assertFalse(new QuantityMeasurementApp.Inches(3.0).equals(new QuantityMeasurementApp.Inches(7.0)));
-    }
-    @Test void givenInches_comparedWithNull_shouldReturnFalse() {
-        assertFalse(new QuantityMeasurementApp.Inches(1.0).equals(null));
-    }
-    @Test void givenFeet_comparedWithNull_shouldReturnFalse() {
-        assertFalse(new QuantityMeasurementApp.Feet(1.0).equals(null));
+    @Test void givenNullUnit_shouldThrowException() {
+        assertThrows(NullPointerException.class,
+            () -> new QuantityMeasurementApp.QuantityLength(1.0, null));
     }
 }
