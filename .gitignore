@@ -1,0 +1,19 @@
+# Maven
+target/
+*.log
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# Mac
+.DS_Store
+
+# VS Code (optional)
+.vscode/
+
+# Data files
+quantity_measurements.dat
