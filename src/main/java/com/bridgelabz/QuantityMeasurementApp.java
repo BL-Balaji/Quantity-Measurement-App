@@ -1,5 +1,19 @@
 ﻿package com.bridgelabz;
+import com.bridgelabz.controller.QuantityMeasurementController;
+import com.bridgelabz.repository.IQuantityMeasurementRepository;
+import com.bridgelabz.repository.QuantityMeasurementCacheRepository;
+import com.bridgelabz.service.IQuantityMeasurementService;
+import com.bridgelabz.service.QuantityMeasurementServiceImpl;
 public class QuantityMeasurementApp {
+    private final QuantityMeasurementController controller;
+    public QuantityMeasurementApp() {
+        IQuantityMeasurementRepository repository = QuantityMeasurementCacheRepository.getInstance();
+        IQuantityMeasurementService service = new QuantityMeasurementServiceImpl(repository);
+        this.controller = new QuantityMeasurementController(service);
+    }
+    public void run() { controller.runAllDemonstrations(); }
+    public static void main(String[] args) { new QuantityMeasurementApp().run(); }
+    // Backward-compat QuantityLength inner class
     public static final class QuantityLength {
         private static final double EPS = 1e-6;
         private final double value; private final LengthUnit unit;
@@ -22,11 +36,5 @@ public class QuantityMeasurementApp {
         }
         @Override public int hashCode() { return java.util.Objects.hash(Math.round(unit.convertToBaseUnit(value)/EPS)); }
         @Override public String toString() { return "Quantity(" + value + ", " + unit + ")"; }
-    }
-    public static void main(String[] args) {
-        Quantity<VolumeUnit> v1 = new Quantity<>(1.0, VolumeUnit.LITRE);
-        Quantity<VolumeUnit> v2 = new Quantity<>(1000.0, VolumeUnit.MILLILITRE);
-        System.out.println("1 litre == 1000 ml: " + v1.equals(v2));
-        System.out.println("1 gallon in litres: " + new Quantity<>(1.0, VolumeUnit.GALLON).convertTo(VolumeUnit.LITRE));
     }
 }
